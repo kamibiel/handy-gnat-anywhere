@@ -1,0 +1,1 @@
+Unlocks the Handy Gnat (build mode) in every difficulty - Relaxed, Normal and Hard. Open the build menu and press G. UE4SS Lua mod, no game files replaced, survives game updates.

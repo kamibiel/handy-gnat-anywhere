@@ -1,0 +1,169 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;padding:0;background:#000}
+  .wrap{width:1920px;height:1080px;position:relative;overflow:hidden;font-family:"Inter Display","Inter",sans-serif}
+  svg{position:absolute;inset:0}
+  .title{position:absolute;left:110px;top:250px;color:#fff8e6}
+  .kicker{font-weight:700;font-size:34px;letter-spacing:10px;color:#ffd166;text-transform:uppercase;margin-bottom:18px}
+  .h1{font-weight:900;font-size:168px;line-height:.9;letter-spacing:-4px;text-shadow:0 8px 0 rgba(40,20,0,.35),0 30px 60px rgba(0,0,0,.35)}
+  .h1 .alt{color:#8ef0c9}
+  .sub{margin-top:34px;font-weight:600;font-size:42px;color:#fff1cf;max-width:860px;line-height:1.25}
+  .chips{margin-top:40px;display:flex;gap:18px}
+  .chip{font-weight:700;font-size:28px;padding:12px 26px;border-radius:999px;background:rgba(20,30,20,.55);color:#fff;border:2px solid rgba(255,255,255,.35)}
+  .chip.k{background:#ffd166;color:#3a2600;border-color:#ffd166}
+</style></head>
+<body><div class="wrap">
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b5f5a"/>
+      <stop offset=".55" stop-color="#d98f3c"/>
+      <stop offset="1" stop-color="#f6c66b"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="1380" cy="560" r="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff2c2" stop-opacity=".95"/>
+      <stop offset=".35" stop-color="#ffd27a" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#ffd27a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bladeFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6c8f4a"/><stop offset="1" stop-color="#3f6233"/>
+    </linearGradient>
+    <linearGradient id="bladeNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f5a2a"/><stop offset="1" stop-color="#14301a"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c98a4b"/><stop offset="1" stop-color="#8a5a2b"/>
+    </linearGradient>
+    <radialGradient id="body" cx=".4" cy=".35" r=".75">
+      <stop offset="0" stop-color="#7a6a5a"/><stop offset=".6" stop-color="#3d332b"/><stop offset="1" stop-color="#1f1a16"/>
+    </radialGradient>
+    <radialGradient id="eye" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#ff8a7a"/><stop offset=".55" stop-color="#c3263a"/><stop offset="1" stop-color="#5c0d1c"/>
+    </radialGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e9fbff" stop-opacity=".85"/><stop offset="1" stop-color="#9fd8ff" stop-opacity=".25"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <rect width="1920" height="1080" fill="url(#sun)"/>
+
+  <!-- far grass blades -->
+  <g fill="url(#bladeFar)" opacity=".75">
+    <path d="M980 1080 C990 700 1010 420 1060 120 C1050 430 1040 760 1050 1080Z"/>
+    <path d="M1120 1080 C1140 760 1190 520 1290 260 C1230 540 1190 800 1180 1080Z"/>
+    <path d="M1700 1080 C1690 760 1660 460 1600 160 C1700 460 1760 780 1770 1080Z"/>
+    <path d="M1830 1080 C1840 800 1870 560 1920 380 L1920 1080Z"/>
+    <path d="M60 1080 C40 800 20 600 -20 420 L0 1080Z"/>
+  </g>
+
+  <!-- ground -->
+  <path d="M0 930 C400 900 900 950 1300 920 C1600 900 1800 930 1920 915 L1920 1080 L0 1080Z" fill="#3a2a1a"/>
+  <path d="M0 960 C500 940 1000 985 1920 950 L1920 1080 L0 1080Z" fill="#2a1d12"/>
+
+  <!-- built wooden wall (solid) -->
+  <g transform="translate(1180 610)">
+    <rect x="0" y="0" width="300" height="320" rx="8" fill="url(#wood)"/>
+    <g stroke="#6b4320" stroke-width="5" opacity=".7">
+      <line x1="0" y1="64" x2="300" y2="64"/><line x1="0" y1="128" x2="300" y2="128"/>
+      <line x1="0" y1="192" x2="300" y2="192"/><line x1="0" y1="256" x2="300" y2="256"/>
+    </g>
+    <rect x="-14" y="-10" width="28" height="340" rx="6" fill="#7a4d24"/>
+    <rect x="286" y="-10" width="28" height="340" rx="6" fill="#7a4d24"/>
+  </g>
+  <!-- blueprint ghost (being placed) -->
+  <g transform="translate(1495 610)" filter="url(#glow)">
+    <rect x="0" y="0" width="300" height="320" rx="8" fill="#7fe8ff" fill-opacity=".18" stroke="#9ff1ff" stroke-width="5" stroke-dasharray="18 12"/>
+    <g stroke="#9ff1ff" stroke-width="3" opacity=".7">
+      <line x1="0" y1="64" x2="300" y2="64"/><line x1="0" y1="128" x2="300" y2="128"/>
+      <line x1="0" y1="192" x2="300" y2="192"/><line x1="0" y1="256" x2="300" y2="256"/>
+    </g>
+    <!-- roof ghost -->
+    <path d="M-330 0 L150 -170 L300 0" fill="#7fe8ff" fill-opacity=".12" stroke="#9ff1ff" stroke-width="5" stroke-dasharray="18 12"/>
+  </g>
+
+  <!-- dew drop -->
+  <g transform="translate(1040 880)">
+    <path d="M0 -70 C30 -30 45 0 45 20 A45 45 0 0 1 -45 20 C-45 0 -30 -30 0 -70Z" fill="#bff3ff" fill-opacity=".55" stroke="#e8fdff" stroke-width="3"/>
+    <ellipse cx="-14" cy="0" rx="10" ry="16" fill="#fff" opacity=".7"/>
+  </g>
+
+  <!-- dashed flight trail -->
+  <path d="M1080 420 C1180 330 1260 470 1370 380" fill="none" stroke="#fff6d8" stroke-width="5" stroke-linecap="round" stroke-dasharray="4 18" opacity=".8"/>
+
+  <!-- THE GNAT (original design) -->
+  <g transform="translate(1480 330) rotate(-8)">
+    <!-- wings -->
+    <g opacity=".95">
+      <ellipse cx="-70" cy="-95" rx="120" ry="48" transform="rotate(-28 -70 -95)" fill="url(#wing)" stroke="#e6fbff" stroke-width="3"/>
+      <ellipse cx="40" cy="-110" rx="125" ry="50" transform="rotate(22 40 -110)" fill="url(#wing)" stroke="#e6fbff" stroke-width="3"/>
+      <path d="M-150 -60 L-10 -100 M-120 -40 L-20 -90" stroke="#cdeefe" stroke-width="2" opacity=".6"/>
+    </g>
+    <!-- legs -->
+    <g stroke="#2a221c" stroke-width="7" stroke-linecap="round" fill="none">
+      <path d="M-30 60 Q-60 120 -90 140"/>
+      <path d="M0 70 Q-5 130 -20 165"/>
+      <path d="M40 60 Q70 110 60 150"/>
+    </g>
+    <!-- abdomen -->
+    <ellipse cx="-120" cy="30" rx="95" ry="62" transform="rotate(-12 -120 30)" fill="url(#body)"/>
+    <g stroke="#5b4d40" stroke-width="5" opacity=".6" fill="none">
+      <path d="M-150 -18 Q-140 30 -150 78"/><path d="M-110 -26 Q-100 30 -110 86"/>
+    </g>
+    <!-- thorax / fuzz -->
+    <circle cx="0" cy="10" r="82" fill="url(#body)"/>
+    <g stroke="#8f7f6c" stroke-width="3" stroke-linecap="round" opacity=".55">
+      <path d="M-40 -66 l-6 -14"/><path d="M-10 -72 l0 -15"/><path d="M22 -68 l6 -14"/><path d="M50 -52 l11 -10"/>
+    </g>
+    <!-- head -->
+    <circle cx="78" cy="-6" r="60" fill="#3a3029"/>
+    <!-- eyes -->
+    <circle cx="105" cy="-24" r="34" fill="url(#eye)"/>
+    <circle cx="70" cy="-38" r="26" fill="url(#eye)"/>
+    <circle cx="96" cy="-36" r="9" fill="#fff" opacity=".85"/>
+    <circle cx="64" cy="-46" r="7" fill="#fff" opacity=".85"/>
+    <!-- smile -->
+    <path d="M100 18 Q118 32 134 14" stroke="#f2d9b8" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- antennae -->
+    <path d="M70 -62 Q60 -110 30 -128" stroke="#2a221c" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M98 -58 Q112 -108 146 -124" stroke="#2a221c" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- tiny hard hat -->
+    <path d="M42 -62 Q85 -112 132 -58 Z" fill="#ffc83d" stroke="#c88b00" stroke-width="4"/>
+    <rect x="34" y="-64" width="106" height="12" rx="6" fill="#ffb300"/>
+    <!-- arm + hammer -->
+    <path d="M60 60 Q120 110 175 105" stroke="#2a221c" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <g transform="translate(175 105) rotate(55)">
+      <rect x="-6" y="-80" width="12" height="100" rx="5" fill="#a86b33"/>
+      <rect x="-34" y="-104" width="68" height="34" rx="7" fill="#9aa3ab" stroke="#5f666d" stroke-width="4"/>
+    </g>
+  </g>
+
+  <!-- near grass blades (foreground frame) -->
+  <g fill="url(#bladeNear)">
+    <path d="M-40 1080 C10 760 60 520 150 300 C120 560 110 820 120 1080Z"/>
+    <path d="M820 1080 C850 860 900 700 980 560 C940 760 920 900 925 1080Z"/>
+    <path d="M1880 1080 C1860 820 1830 620 1760 470 C1860 620 1930 820 1960 1080Z"/>
+  </g>
+
+  <!-- floating motes -->
+  <g fill="#fff4cf">
+    <circle cx="900" cy="200" r="4" opacity=".7"/><circle cx="1650" cy="140" r="5" opacity=".6"/>
+    <circle cx="1210" cy="520" r="3" opacity=".7"/><circle cx="1800" cy="420" r="4" opacity=".5"/>
+    <circle cx="700" cy="120" r="3" opacity=".5"/>
+  </g>
+
+  <!-- left legibility gradient -->
+  <defs><linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#0d1a14" stop-opacity=".72"/><stop offset=".55" stop-color="#0d1a14" stop-opacity="0"/></linearGradient></defs>
+  <rect width="1920" height="1080" fill="url(#fade)"/>
+</svg>
+
+<div class="title">
+  <div class="kicker">Grounded 2 · UE4SS Mod</div>
+  <div class="h1">Handy Gnat<br><span class="alt">Anywhere</span></div>
+  <div class="sub">Build mode unlocked in every difficulty.<br>Open the build menu, press G.</div>
+  <div class="chips"><span class="chip k">Relaxed</span><span class="chip k">Normal</span><span class="chip k">Hard</span></div>
+</div>
+</div></body></html>

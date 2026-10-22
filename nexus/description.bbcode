@@ -1,0 +1,53 @@
+[center][size=6][b]Handy Gnat Anywhere[/b][/size]
+[size=4]Build mode unlocked in every difficulty — Relaxed, Normal and Hard.[/size][/center]
+
+[size=4][b]What it does[/b][/size]
+In vanilla Grounded 2 the Handy Gnat (build mode) is only available in Creative. This mod unlocks it in every difficulty: open the build menu, press [b]G[/b] and build with the Gnat.
+
+[list]
+[*]Changes [b]only[/b] that permission. Difficulty, hunger/thirst, damage and achievements stay as they are.
+[*]Runtime UE4SS Lua mod — [b]no game files are replaced[/b]. It matches the option by name, so game updates that reorder the preset options don't break it (this is why older .pak versions stopped working).
+[*]Optional hotkeys: [b]Ctrl+F7[/b] re-apply · [b]Ctrl+F6[/b] free camera (spectator mode).
+[/list]
+
+[size=4][b]Requirements[/b][/size]
+[list]
+[*]Grounded 2 (Steam)
+[*][url=https://www.nexusmods.com/grounded2/mods/259]UE4SS for Grounded 2[/url]
+[/list]
+
+[size=4][b]Installation[/b][/size]
+[list=1]
+[*]Install [b]UE4SS for Grounded 2[/b] into [i]...\steamapps\common\Grounded2\Augusta\Binaries\Win64\[/i]
+[*]Extract the [b]HandyGnatAnywhere[/b] folder into [i]...\Grounded2\Augusta\Binaries\Win64\ue4ss\Mods\[/i]
+(it already contains enabled.txt — no need to edit mods.txt)
+[*]Remove any old Handy Gnat .pak/.ucas/.utoc mod from [i]Augusta\Content\Paks[/i]
+[/list]
+
+[size=4][b]Usage[/b][/size]
+Enter your world, wait a few seconds, open the build menu and press [b]G[/b].
+If the Gnat doesn't show up, press [b]Ctrl+F7[/b] and try again.
+Multiplayer: the [b]host[/b] should have the mod installed.
+
+[size=4][b]Configuration[/b][/size]
+The top of [i]HandyGnatAnywhere\Scripts\main.lua[/i] has a Config section. You can force other preset options the same way, e.g. [b]bAutoCompleteBuildings = true[/b] (instant building) or [b]bUnlockAllRecipes = true[/b].
+
+[size=4][b]Troubleshooting[/b][/size]
+Open [i]...\Win64\ue4ss\UE4SS.log[/i] and look for lines starting with [b][HandyGnatAnywhere][/b]. Post them in the Bugs tab or on GitHub.
+
+[size=4][b]Uninstall[/b][/size]
+Delete the [i]ue4ss\Mods\HandyGnatAnywhere[/i] folder.
+
+[size=4][b]Source code[/b][/size]
+[url=https://github.com/kamibiel/handy-gnat-anywhere]github.com/kamibiel/handy-gnat-anywhere[/url] (MIT)
+
+[size=4][b]Credits[/b][/size]
+Inspired by the original Handy Gnat .pak mod ([url=https://www.nexusmods.com/grounded2/mods/212]mod #212[/url]). Independent rewrite — no files from that mod are included.
+Thanks to the UE4SS team.
+
+[size=2]Not affiliated with Obsidian Entertainment, Xbox Game Studios or Microsoft.[/size]
+
+[line]
+[size=4][b]Português (BR)[/b][/size]
+Libera a [b]Mosca Útil[/b] (modo de construção) em todas as dificuldades. Abra a construção e aperte [b]G[/b].
+Instalação: instale o UE4SS for Grounded 2 e extraia a pasta [b]HandyGnatAnywhere[/b] em [i]...\Win64\ue4ss\Mods\[/i]. Ctrl+F7 reaplica, Ctrl+F6 câmera livre. No multiplayer, quem hospeda precisa ter o mod.
