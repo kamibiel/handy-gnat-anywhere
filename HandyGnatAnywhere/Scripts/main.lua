@@ -1,6 +1,6 @@
 --[[
     Handy Gnat Anywhere - Grounded 2 (UE4SS Lua mod)
-    Version 1.0.0  |  https://github.com/kamibiel/handy-gnat-anywhere
+    Version 1.0.1  |  https://github.com/kamibiel/handy-gnat-anywhere
     -------------------------------------------------------------
     Unlocks the Handy Gnat (build mode) in every difficulty, not
     only in Creative.
@@ -50,7 +50,7 @@ local Config = {
 }
 ------------------------------------------------------------------
 
-local VERSION = "1.0.0"
+local VERSION = "1.0.1"
 local TAG = "[HandyGnatAnywhere] "
 local function log(msg) print(TAG .. msg .. "\n") end
 
@@ -123,8 +123,28 @@ local function pathsFor(cls)
     return ClassCache[a]
 end
 
-local function applyEverywhere()
-    local changed, seen = 0, 0
+-- Places found by the last full scan, re-used on later applies so the
+-- (expensive) full object scan runs only once per world.
+local Tracked = {}
+
+local function setEntry(obj, e)
+    local want = Config.Options[e.opt]
+    local changed = false
+    local ok = pcall(function()
+        local v = obj
+        for i = 1, #e.path - 1 do v = v[e.path[i]] end
+        local last = e.path[#e.path]
+        if v[last] ~= want then
+            v[last] = want
+            changed = true
+        end
+    end)
+    return ok, changed
+end
+
+local function fullScan()
+    Tracked = {}
+    local changed = 0
     ForEachUObject(function(obj)
         if not valid(obj) then return end
         local okC, cls = pcall(function() return obj:GetClass() end)
@@ -132,48 +152,70 @@ local function applyEverywhere()
         local paths = pathsFor(cls)
         if #paths == 0 then return end
         for _, e in ipairs(paths) do
-            seen = seen + 1
-            local want = Config.Options[e.opt]
-            local ok = pcall(function()
-                local v = obj
-                for i = 1, #e.path - 1 do v = v[e.path[i]] end
-                local last = e.path[#e.path]
-                if v[last] ~= want then
-                    v[last] = want
-                    changed = changed + 1
-                    local nm = "?"
-                    pcall(function() nm = obj:GetFullName() end)
-                    log(string.format("%s :: %s -> %s", nm, table.concat(e.path, "."), tostring(want)))
-                end
-            end)
+            Tracked[#Tracked + 1] = { obj = obj, entry = e }
+            local ok, did = setEntry(obj, e)
+            if did then changed = changed + 1 end
             if not ok then log("Failed to set " .. table.concat(e.path, ".")) end
         end
     end)
-    return changed, seen
+    return changed, #Tracked
 end
 
-local function applyAll()
+-- Cheap path: only the places already known. Returns nil if they are gone
+-- (new world loaded), so the caller falls back to a full scan.
+local function quickApply()
+    if #Tracked == 0 then return nil end
+    local changed, alive = 0, 0
+    for _, t in ipairs(Tracked) do
+        if valid(t.obj) then
+            alive = alive + 1
+            local _, did = setEntry(t.obj, t.entry)
+            if did then changed = changed + 1 end
+        end
+    end
+    if alive == 0 then return nil end
+    return changed, alive
+end
+
+local function applyAll(forceFull)
     local p = applyPresets()
-    local changed, seen = applyEverywhere()
-    log(string.format("Applied: %d preset option(s), %d change(s) in %d place(s). Open the build menu and press G.",
-        p, changed, seen))
+    local changed, seen, mode
+    if not forceFull then
+        changed, seen = quickApply()
+        mode = "quick"
+    end
+    if changed == nil then
+        changed, seen = fullScan()
+        mode = "full scan"
+    end
+    if mode == "full scan" or changed > 0 then
+        log(string.format("Applied (%s): %d preset option(s), %d change(s) in %d place(s).",
+            mode, p, changed, seen))
+    end
 end
 
-local function safeApply()
+local function safeApply(forceFull)
     ExecuteInGameThread(function()
-        local ok, err = pcall(applyAll)
+        local ok, err = pcall(applyAll, forceFull)
         if not ok then log("Error: " .. tostring(err)) end
     end)
 end
 
--- Apply when the player spawns in a world
+-- Apply when the player spawns in a world. ClientRestart also fires on every
+-- mount/dismount and respawn, so collapse bursts into a single (cheap) apply.
+local Pending = false
 RegisterHook("/Script/Engine.PlayerController:ClientRestart", function()
-    ExecuteWithDelay(Config.ApplyDelayMs, safeApply)
+    if Pending then return end
+    Pending = true
+    ExecuteWithDelay(Config.ApplyDelayMs, function()
+        Pending = false
+        safeApply(false)
+    end)
 end)
 
 RegisterKeyBind(Config.ReapplyKey, Config.ModifierKeys, function()
-    log("Re-applying...")
-    safeApply()
+    log("Re-applying (full scan)...")
+    safeApply(true)
 end)
 
 -- Optional free camera
