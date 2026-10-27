@@ -1,11 +1,14 @@
 # Changelog
 
 ## 1.0.2 — 2026-10-27
-- Fix: freezes of a few seconds in big worlds. The mod no longer walks every object in the game:
-  it only looks at the few classes that hold the game mode settings (targeted, ~instant).
+- Fix: freezes of several seconds (up to ~7 s in big worlds). The mod no longer walks every object
+  in the game: it goes straight to the 19 places that hold the game mode settings — the game's
+  default objects, the running GameInstance, and the world's active preset (reached through the
+  mode manager's `GameModeSettings`). Measured: ~130 ms once when entering a world, instead of ~7 s.
+- After applying, the log shows the game's own answer (`IsBuildModeAvailable`).
 - Also unlocks the Custom game mode preset.
-- `Ctrl+F7` re-applies (targeted); `Ctrl+Shift+F7` forces the old full scan as a last resort.
-- The log now shows how long each apply took.
+- `Ctrl+F7` re-applies; `Ctrl+Shift+F7` forces the old full scan as a last resort (it also
+  remembers what it finds in `HandyGnatAnywhere_targets.txt` next to the game's exe).
 
 ## 1.0.1 — 2026-10-23
 - Fix: small stutters when mounting/dismounting, respawning, etc. The full object scan now runs

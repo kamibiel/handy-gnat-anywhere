@@ -16,6 +16,7 @@ Open the build menu, press **G**, and build with the Gnat in Relaxed, Normal or 
 - Runtime UE4SS Lua mod: **no game files are replaced**, so game updates that reorder the
   preset options don't break it (unlike the older `.pak` approach).
 - Optional hotkeys: `Ctrl+F7` re-apply · `Ctrl+F6` free camera (spectator mode).
+- Lightweight: no scan of the game's objects — about 0.1 s once when you enter a world.
 
 ## Requirements
 
@@ -34,7 +35,8 @@ Open the build menu, press **G**, and build with the Gnat in Relaxed, Normal or 
 ## Usage
 
 Enter your world, wait a few seconds, open the build menu and press **G**.
-If the Gnat doesn't show up, press **Ctrl+F7** and try again.
+If the Gnat doesn't show up, press **Ctrl+F7** and try again. As a last resort, **Ctrl+Shift+F7**
+runs a full scan (the game freezes for a few seconds) and remembers what it finds.
 
 In multiplayer, the **host** should have the mod installed.
 

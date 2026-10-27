@@ -48,7 +48,7 @@ local Config = {
     SpectatorKey   = Key.F6,
     ModifierKeys   = { ModifierKey.CONTROL },
     MaxStructDepth = 3,
-    LogPlaces      = true,  -- list every place that was set (diagnostics)
+    LogPlaces      = false, -- list every place that was set (diagnostics)
 }
 ------------------------------------------------------------------
 
@@ -232,6 +232,22 @@ local TargetClasses = {
 -- Known objects (paths) that hold the setting, including the game's default
 -- objects that FindAllOf does not return. Filled from a full scan on 0.6.0.3.
 local KnownObjects = {
+    "/Script/Maine.Default__SurvivalGameModeSettings",
+    "/Script/Maine.Default__SurvivalModeManagerComponent",
+    "/Script/Maine.Default__InGameGameState:SurvivalModeManagerComponent",
+    "/Script/Maine.Default__SurvivalGameState:SurvivalModeManagerComponent",
+    "/Script/Maine.Default__LobbyGameState:SurvivalModeManagerComponent",
+    "/Script/Maine.Default__SurvivalGameInstance",
+    "/Game/Blueprints/Global/BP_SurvivalGameState.Default__BP_SurvivalGameState_C:SurvivalModeManagerComponent",
+    "/Game/Blueprints/Global/BP_SurvivalGameInstance.Default__BP_SurvivalGameInstance_C",
+    "/Game/_Augusta/Global/GameInstance/BP_SurvivalGameInstance_Augusta.Default__BP_SurvivalGameInstance_Augusta_C",
+    "/Game/Blueprints/Global/BP_NormalModeSettings.Default__BP_NormalModeSettings_C",
+    "/Game/Blueprints/Global/BP_RelaxedModeSettings.Default__BP_RelaxedModeSettings_C",
+    "/Game/Blueprints/Global/BP_HardModeSettings.Default__BP_HardModeSettings_C",
+    "/Game/Blueprints/Global/BP_CustomModeSettings.Default__BP_CustomModeSettings_C",
+    "/Game/Blueprints/Global/BP_CreativeModeSettings.Default__BP_CreativeModeSettings_C",
+    "/Game/Blueprints/Global/BP_CreativeCreaturesModeSettings.Default__BP_CreativeCreaturesModeSettings_C",
+    "/Game/Blueprints/Global/BP_InventorModeSettings.Default__BP_InventorModeSettings_C",
 }
 
 local function targetedScan()
