@@ -143,22 +143,62 @@ local function setEntry(obj, e)
     return ok, changed
 end
 
+-- Objects found by a full scan are remembered (by path) in this file, so the
+-- next sessions find them instantly with StaticFindObject instead of scanning.
+local LEARNED_FILE = "HandyGnatAnywhere_targets.txt"
+
+local function objectPath(obj)
+    -- GetFullName() is "<Class> <Path>"; StaticFindObject wants just <Path>
+    local full = ""
+    pcall(function() full = obj:GetFullName() end)
+    return (full:match("^%S+%s+(.+)$")) or full
+end
+
+local function loadLearned()
+    local list = {}
+    local f = io.open(LEARNED_FILE, "r")
+    if not f then return list end
+    for line in f:lines() do
+        line = line:gsub("%s+$", "")
+        if line ~= "" and not line:match("^#") then list[#list + 1] = line end
+    end
+    f:close()
+    return list
+end
+
+local function saveLearned(paths)
+    local f = io.open(LEARNED_FILE, "w")
+    if not f then log("could not write " .. LEARNED_FILE) return end
+    f:write("# Handy Gnat Anywhere - objects that hold bBuildModeAvailable (written by a full scan)\n")
+    for _, p in ipairs(paths) do f:write(p .. "\n") end
+    f:close()
+end
+
 local function fullScan()
     Tracked = {}
     local changed = 0
+    local learned, seen = {}, {}
     ForEachUObject(function(obj)
         if not valid(obj) then return end
         local okC, cls = pcall(function() return obj:GetClass() end)
         if not okC or not valid(cls) then return end
         local paths = pathsFor(cls)
         if #paths == 0 then return end
+        local p = objectPath(obj)
         for _, e in ipairs(paths) do
             Tracked[#Tracked + 1] = { obj = obj, entry = e }
             local ok, did = setEntry(obj, e)
             if did then changed = changed + 1 end
             if not ok then log("Failed to set " .. table.concat(e.path, ".")) end
+            log(string.format("PLACE %s :: %s%s", p, table.concat(e.path, "."), did and " (changed)" or ""))
+        end
+        -- transient objects (renamed every session) are found by class instead
+        if not seen[p] and not p:find("/Engine/Transient", 1, true) then
+            seen[p] = true
+            learned[#learned + 1] = p
         end
     end)
+    saveLearned(learned)
     return changed, #Tracked
 end
 
@@ -188,13 +228,34 @@ local TargetClasses = {
     "BP_CustomModeSettings_C", "SurvivalGameModeSettings",
 }
 
+-- Known objects (paths) that hold the setting, including the game's default
+-- objects that FindAllOf does not return. Filled from a full scan on 0.6.0.3.
+local KnownObjects = {
+}
+
 local function targetedScan()
     Tracked = {}
     local changed, seenObj = 0, {}
-    for _, cname in ipairs(TargetClasses) do
-        local list = nil
-        pcall(function() list = FindAllOf(cname) end)
-        for _, obj in ipairs(list or {}) do
+    local function candidates()
+        local out = {}
+        local paths = {}
+        for _, p in ipairs(KnownObjects) do paths[#paths + 1] = p end
+        for _, p in ipairs(loadLearned()) do paths[#paths + 1] = p end
+        for _, p in ipairs(paths) do
+            local o = nil
+            pcall(function() o = StaticFindObject(p) end)
+            if valid(o) then out[#out + 1] = o end
+        end
+        for _, cname in ipairs(TargetClasses) do
+            local list = nil
+            pcall(function() list = FindAllOf(cname) end)
+            for _, o in ipairs(list or {}) do out[#out + 1] = o end
+        end
+        return out
+    end
+    do
+        local list = candidates()
+        for _, obj in ipairs(list) do
             if valid(obj) then
                 local addr = obj:GetAddress()
                 if not seenObj[addr] then
