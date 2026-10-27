@@ -252,6 +252,17 @@ local function targetedScan()
             pcall(function() list = FindAllOf(cname) end)
             for _, o in ipairs(list or {}) do out[#out + 1] = o end
         end
+        -- The world's ACTIVE preset object (renamed every session): follow the
+        -- live mode manager's GameModeSettings pointer to it.
+        pcall(function()
+            for _, comp in ipairs(FindAllOf("SurvivalModeManagerComponent") or {}) do
+                if valid(comp) then
+                    local gms = nil
+                    pcall(function() gms = comp.GameModeSettings end)
+                    if valid(gms) then out[#out + 1] = gms end
+                end
+            end
+        end)
         -- The running GameInstance lives under /Engine/Transient with a new
         -- name every session: reach it through the engine instead.
         pcall(function() out[#out + 1] = FindFirstOf("GameInstance") end)
@@ -308,8 +319,19 @@ local function applyAll(mode)
     end
     local ms = (os.clock() - t0) * 1000
     if mode ~= "quick" or changed > 0 then
-        log(string.format("Applied (%s, %.0f ms): %d preset option(s), %d change(s) in %d place(s).",
-            mode, ms, p, changed, seen))
+        -- Ask the game itself whether build mode (Handy Gnat) is now available
+        local verdict = "unknown"
+        pcall(function()
+            for _, comp in ipairs(FindAllOf("SurvivalModeManagerComponent") or {}) do
+                if valid(comp) then
+                    local r = comp:IsBuildModeAvailable()
+                    verdict = tostring(r)
+                    break
+                end
+            end
+        end)
+        log(string.format("Applied (%s, %.0f ms): %d preset option(s), %d change(s) in %d place(s). Game says Handy Gnat available: %s",
+            mode, ms, p, changed, seen, verdict))
     end
 end
 
