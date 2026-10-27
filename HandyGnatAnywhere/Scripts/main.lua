@@ -1,6 +1,6 @@
 --[[
     Handy Gnat Anywhere - Grounded 2 (UE4SS Lua mod)
-    Version 1.0.1  |  https://github.com/kamibiel/handy-gnat-anywhere
+    Version 1.0.2  |  https://github.com/kamibiel/handy-gnat-anywhere
     -------------------------------------------------------------
     Unlocks the Handy Gnat (build mode) in every difficulty, not
     only in Creative.
@@ -18,7 +18,8 @@
       Enter your world, open the build menu and press G.
 
     Hotkeys
-      Ctrl + F7  -> re-apply (if the Gnat does not show up)
+      Ctrl + F7         -> re-apply (if the Gnat does not show up)
+      Ctrl + Shift + F7 -> re-apply with a full scan (slow, last resort)
       Ctrl + F6  -> toggle free camera (spectator mode), optional
 
     Log: ...\Grounded2\Augusta\Binaries\Win64\ue4ss\UE4SS.log
@@ -40,7 +41,7 @@ local Config = {
     },
 
     -- Presets that receive the change
-    Presets = { "BP_NormalModeSettings", "BP_RelaxedModeSettings", "BP_HardModeSettings" },
+    Presets = { "BP_NormalModeSettings", "BP_RelaxedModeSettings", "BP_HardModeSettings", "BP_CustomModeSettings" },
 
     ApplyDelayMs   = 3000,
     ReapplyKey     = Key.F7,
@@ -50,7 +51,7 @@ local Config = {
 }
 ------------------------------------------------------------------
 
-local VERSION = "1.0.1"
+local VERSION = "1.0.2"
 local TAG = "[HandyGnatAnywhere] "
 local function log(msg) print(TAG .. msg .. "\n") end
 
@@ -177,26 +178,66 @@ local function quickApply()
     return changed, alive
 end
 
-local function applyAll(forceFull)
+-- Targeted scan: only the classes known to hold the game mode settings
+-- (found with a full scan on game version 0.6). No walk over every object in
+-- the game, so no freeze, even in big worlds.
+local TargetClasses = {
+    "SurvivalModeManagerComponent",
+    "BP_SurvivalGameInstance_Augusta_C", "BP_SurvivalGameInstance_C", "SurvivalGameInstance",
+    "BP_NormalModeSettings_C", "BP_RelaxedModeSettings_C", "BP_HardModeSettings_C",
+    "BP_CustomModeSettings_C", "SurvivalGameModeSettings",
+}
+
+local function targetedScan()
+    Tracked = {}
+    local changed, seenObj = 0, {}
+    for _, cname in ipairs(TargetClasses) do
+        local list = nil
+        pcall(function() list = FindAllOf(cname) end)
+        for _, obj in ipairs(list or {}) do
+            if valid(obj) then
+                local addr = obj:GetAddress()
+                if not seenObj[addr] then
+                    seenObj[addr] = true
+                    local okC, cls = pcall(function() return obj:GetClass() end)
+                    if okC and valid(cls) then
+                        for _, e in ipairs(pathsFor(cls)) do
+                            Tracked[#Tracked + 1] = { obj = obj, entry = e }
+                            local ok, did = setEntry(obj, e)
+                            if did then changed = changed + 1 end
+                            if not ok then log("Failed to set " .. table.concat(e.path, ".")) end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return changed, #Tracked
+end
+
+local function applyAll(mode)
+    local t0 = os.clock()
     local p = applyPresets()
-    local changed, seen, mode
-    if not forceFull then
+    local changed, seen
+    if mode == "quick" then
         changed, seen = quickApply()
-        mode = "quick"
+        if changed == nil then mode = "targeted" end
     end
-    if changed == nil then
+    if mode == "targeted" then
+        changed, seen = targetedScan()
+    elseif mode == "full" then
         changed, seen = fullScan()
-        mode = "full scan"
     end
-    if mode == "full scan" or changed > 0 then
-        log(string.format("Applied (%s): %d preset option(s), %d change(s) in %d place(s).",
-            mode, p, changed, seen))
+    local ms = (os.clock() - t0) * 1000
+    if mode ~= "quick" or changed > 0 then
+        log(string.format("Applied (%s, %.0f ms): %d preset option(s), %d change(s) in %d place(s).",
+            mode, ms, p, changed, seen))
     end
 end
 
-local function safeApply(forceFull)
+local function safeApply(mode)
     ExecuteInGameThread(function()
-        local ok, err = pcall(applyAll, forceFull)
+        local ok, err = pcall(applyAll, mode)
         if not ok then log("Error: " .. tostring(err)) end
     end)
 end
@@ -209,13 +250,19 @@ RegisterHook("/Script/Engine.PlayerController:ClientRestart", function()
     Pending = true
     ExecuteWithDelay(Config.ApplyDelayMs, function()
         Pending = false
-        safeApply(false)
+        safeApply("quick")
     end)
 end)
 
+-- Ctrl+F7: targeted re-apply. Ctrl+Shift+F7: full scan of every object
+-- (slow - a few seconds of freeze - only as a last resort).
 RegisterKeyBind(Config.ReapplyKey, Config.ModifierKeys, function()
-    log("Re-applying (full scan)...")
-    safeApply(true)
+    log("Re-applying...")
+    safeApply("targeted")
+end)
+RegisterKeyBind(Config.ReapplyKey, { ModifierKey.CONTROL, ModifierKey.SHIFT }, function()
+    log("Re-applying with a FULL scan (the game may freeze for a few seconds)...")
+    safeApply("full")
 end)
 
 -- Optional free camera
