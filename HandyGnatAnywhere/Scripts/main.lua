@@ -48,6 +48,7 @@ local Config = {
     SpectatorKey   = Key.F6,
     ModifierKeys   = { ModifierKey.CONTROL },
     MaxStructDepth = 3,
+    LogPlaces      = true,  -- list every place that was set (diagnostics)
 }
 ------------------------------------------------------------------
 
@@ -251,6 +252,19 @@ local function targetedScan()
             pcall(function() list = FindAllOf(cname) end)
             for _, o in ipairs(list or {}) do out[#out + 1] = o end
         end
+        -- The running GameInstance lives under /Engine/Transient with a new
+        -- name every session: reach it through the engine instead.
+        pcall(function() out[#out + 1] = FindFirstOf("GameInstance") end)
+        pcall(function()
+            local eng = FindFirstOf("GameEngine")
+            if valid(eng) then out[#out + 1] = eng.GameInstance end
+        end)
+        pcall(function()
+            local gs = StaticFindObject("/Script/Engine.Default__GameplayStatics")
+            for _, pc in ipairs(FindAllOf("PlayerController") or FindAllOf("SurvivalPlayerController") or {}) do
+                if valid(pc) and valid(gs) then out[#out + 1] = gs:GetGameInstance(pc) break end
+            end
+        end)
         return out
     end
     do
@@ -267,6 +281,9 @@ local function targetedScan()
                             local ok, did = setEntry(obj, e)
                             if did then changed = changed + 1 end
                             if not ok then log("Failed to set " .. table.concat(e.path, ".")) end
+                            if Config.LogPlaces then
+                                log(string.format("TPLACE %s :: %s%s", objectPath(obj), table.concat(e.path, "."), did and " (changed)" or ""))
+                            end
                         end
                     end
                 end
